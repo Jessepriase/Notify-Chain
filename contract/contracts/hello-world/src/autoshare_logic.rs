@@ -109,6 +109,7 @@ pub fn get_autoshare(env: Env, id: BytesN<32>) -> Result<AutoShareDetails, Error
     env.storage().persistent().get(&key).ok_or(Error::NotFound)
 }
 
+/// Retrieves all existing AutoShare groups in the system.
 pub fn get_all_groups(env: Env) -> Vec<AutoShareDetails> {
     let all_groups_key = DataKey::AllGroups;
     let group_ids: Vec<BytesN<32>> = env
@@ -126,6 +127,7 @@ pub fn get_all_groups(env: Env) -> Vec<AutoShareDetails> {
     result
 }
 
+/// Retrieves all AutoShare groups created by a specific address.
 pub fn get_groups_by_creator(env: Env, creator: Address) -> Vec<AutoShareDetails> {
     let all_groups = get_all_groups(env.clone());
     let mut result: Vec<AutoShareDetails> = Vec::new(&env);
@@ -138,6 +140,7 @@ pub fn get_groups_by_creator(env: Env, creator: Address) -> Vec<AutoShareDetails
     result
 }
 
+/// Checks if a given address is a member of a specific AutoShare group.
 pub fn is_group_member(env: Env, id: BytesN<32>, address: Address) -> Result<bool, Error> {
     // First check if the group exists
     let group_key = DataKey::AutoShare(id.clone());
@@ -160,6 +163,7 @@ pub fn is_group_member(env: Env, id: BytesN<32>, address: Address) -> Result<boo
     Ok(false)
 }
 
+/// Retrieves the list of members for a specific AutoShare group.
 pub fn get_group_members(env: Env, id: BytesN<32>) -> Result<Vec<GroupMember>, Error> {
     let details = get_autoshare(env, id)?;
     Ok(details.members)
@@ -629,6 +633,7 @@ pub fn update_members(
     Ok(())
 }
 
+/// Deactivates a specific AutoShare group, preventing further usage.
 pub fn deactivate_group(env: Env, id: BytesN<32>, caller: Address) -> Result<(), Error> {
     caller.require_auth();
 
@@ -662,6 +667,7 @@ pub fn deactivate_group(env: Env, id: BytesN<32>, caller: Address) -> Result<(),
     Ok(())
 }
 
+/// Activates a previously deactivated AutoShare group.
 pub fn activate_group(env: Env, id: BytesN<32>, caller: Address) -> Result<(), Error> {
     caller.require_auth();
 
@@ -695,6 +701,7 @@ pub fn activate_group(env: Env, id: BytesN<32>, caller: Address) -> Result<(), E
     Ok(())
 }
 
+/// Checks if a specific AutoShare group is currently active.
 pub fn is_group_active(env: Env, id: BytesN<32>) -> Result<bool, Error> {
     let key = DataKey::AutoShare(id);
     let details: AutoShareDetails = env
