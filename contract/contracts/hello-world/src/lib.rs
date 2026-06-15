@@ -229,23 +229,20 @@ impl AutoShareContract {
     }
 }
 
-// 3. Link the tests (Requirement: Unit Tests)
 #[cfg(test)]
-#[path = "tests/autoshare_test.rs"]
-mod autoshare_test; // Links the internal tests/autoshare_test.rs inside src
+mod tests {
+    #[path = "../tests/autoshare_test.rs"]
+    mod autoshare_test;
 
-#[cfg(test)]
-#[path = "tests/pause_test.rs"]
-mod pause_test;
+    #[path = "../tests/pause_test.rs"]
+    mod pause_test;
 
-#[cfg(test)]
-#[path = "tests/mock_token_test.rs"]
-mod mock_token_test;
+    #[path = "../tests/mock_token_test.rs"]
+    mod mock_token_test;
 
-#[cfg(test)]
-#[path = "tests/test_utils.rs"]
-pub mod test_utils;
+    #[path = "../tests/test_utils.rs"]
+    pub mod test_utils;
 
-#[cfg(test)]
-#[path = "tests/test_utils_test.rs"]
-mod test_utils_test;
+    #[path = "../tests/test_utils_test.rs"]
+    mod test_utils_test;
+}
