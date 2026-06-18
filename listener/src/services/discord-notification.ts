@@ -75,9 +75,6 @@ export class DiscordNotificationService {
       }
 
       this.deduplicator.markSent(fingerprint);
-      logger.info('Discord notification sent successfully', {
-        eventId: event.id,
-        contractAddress: contractConfig.address,
       logger.info('Discord notification delivered', {
         ...logContext,
         durationMs,
