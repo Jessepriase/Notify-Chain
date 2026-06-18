@@ -2,6 +2,7 @@ import http from 'http';
 import * as StellarSDK from '@stellar/stellar-sdk';
 import { eventRegistry } from '../store/event-registry';
 import logger from '../utils/logger';
+import { generateRequestId } from '../utils/request-id';
 
 export interface EventsServerOptions {
   port: number;
@@ -115,9 +116,13 @@ export function createEventsServer(options: EventsServerOptions): http.Server {
   const corsOrigin = options.corsOrigin ?? 'http://localhost:5173';
 
   return http.createServer((req, res) => {
+    const requestId = generateRequestId();
+    const startTime = Date.now();
+
     res.setHeader('Access-Control-Allow-Origin', corsOrigin);
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('X-Request-Id', requestId);
 
     if (req.method === 'OPTIONS') {
       res.writeHead(204);
@@ -142,6 +147,12 @@ export function createEventsServer(options: EventsServerOptions): http.Server {
       const url = new URL(req.url, 'http://localhost');
       const limitParam = url.searchParams.get('limit');
       const limit = limitParam ? parseInt(limitParam, 10) : undefined;
+
+      logger.info('Handling GET /api/events', {
+        requestId,
+        limit: limit ?? 'all',
+      });
+
       const events =
         limit !== undefined && !Number.isNaN(limit)
           ? eventRegistry.getEvents(limit)
@@ -154,8 +165,20 @@ export function createEventsServer(options: EventsServerOptions): http.Server {
           events,
         })
       );
+
+      logger.info('GET /api/events complete', {
+        requestId,
+        returned: events.length,
+        durationMs: Date.now() - startTime,
+      });
       return;
     }
+
+    logger.warn('Unhandled request', {
+      requestId,
+      method: req.method,
+      url: req.url,
+    });
 
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Not found' }));
