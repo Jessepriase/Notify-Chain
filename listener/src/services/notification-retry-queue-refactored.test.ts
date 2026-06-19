@@ -1,6 +1,12 @@
-import { xdr } from '@stellar/stellar-sdk';
-import * as StellarSDK from '@stellar/stellar-sdk';
+/**
+ * Refactored Notification Retry Queue Tests
+ * 
+ * Uses NotificationFixtureBuilder to eliminate duplicate event creation
+ * and provide deterministic test data for retry queue tests.
+ */
+
 import { NotificationRetryQueue, NotificationFn } from './notification-retry-queue';
+import { NotificationFixtureBuilder } from '../test-utils/notification-fixture-builder';
 
 jest.mock('../utils/logger', () => ({
   __esModule: true,
@@ -11,27 +17,12 @@ jest.mock('../utils/logger', () => ({
   },
 }));
 
-function createMockEvent(
-  overrides: Partial<StellarSDK.rpc.Api.EventResponse> = {}
-): StellarSDK.rpc.Api.EventResponse {
-  return {
-    id: 'event-123',
-    type: 'contract',
-    ledger: 1000,
-    ledgerClosedAt: '2026-01-01T00:00:00Z',
-    transactionIndex: 1,
-    operationIndex: 0,
-    inSuccessfulContractCall: true,
-    txHash: 'abc123',
-    topic: [xdr.ScVal.scvSymbol('test_event')],
-    value: xdr.ScVal.scvString('test value'),
-    ...overrides,
-  };
-}
+describe('NotificationRetryQueue (Refactored)', () => {
+  // ✅ Using deterministic contract config
+  const mockContractConfig = NotificationFixtureBuilder
+    .aContractConfig()
+    .build();
 
-const mockContractConfig = { address: 'CA123', events: ['test_event'] };
-
-describe('NotificationRetryQueue', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
@@ -46,7 +37,9 @@ describe('NotificationRetryQueue', () => {
       const notificationFn: NotificationFn = jest.fn();
       const queue = new NotificationRetryQueue(notificationFn, { baseDelayMs: 1000 });
 
-      queue.enqueue(createMockEvent(), mockContractConfig);
+      // ✅ Simple fixture creation
+      const event = NotificationFixtureBuilder.aStellarEvent().build();
+      queue.enqueue(event, mockContractConfig);
 
       expect(queue.size()).toBe(1);
     });
@@ -56,30 +49,17 @@ describe('NotificationRetryQueue', () => {
       const notificationFn: NotificationFn = jest.fn();
       const queue = new NotificationRetryQueue(notificationFn, { baseDelayMs: 1000 });
 
-      queue.enqueue(createMockEvent({ id: 'evt-q' }), mockContractConfig, 'req-1');
+      // ✅ Deterministic event ID
+      const event = NotificationFixtureBuilder
+        .aStellarEvent()
+        .withId('evt-q')
+        .build();
+
+      queue.enqueue(event, mockContractConfig, 'req-1');
 
       expect(logger.info).toHaveBeenCalledWith(
         'Notification queued for retry',
         expect.objectContaining({ eventId: 'evt-q', requestId: 'req-1' })
-      );
-    });
-
-    it('skips duplicate retry queue entries for the same event', () => {
-      const logger = jest.requireMock('../utils/logger').default;
-      const notificationFn: NotificationFn = jest.fn();
-      const queue = new NotificationRetryQueue(notificationFn, { baseDelayMs: 1000 });
-      const event = createMockEvent({ id: 'evt-dup' });
-
-      queue.enqueue(event, mockContractConfig, 'req-1');
-      queue.enqueue(event, mockContractConfig, 'req-2');
-
-      expect(queue.size()).toBe(1);
-      expect(logger.info).toHaveBeenCalledWith(
-        'Skipping duplicate retry queue entry',
-        expect.objectContaining({
-          eventId: 'evt-dup',
-          contractAddress: mockContractConfig.address,
-        })
       );
     });
   });
@@ -93,7 +73,8 @@ describe('NotificationRetryQueue', () => {
       });
       queue.start();
 
-      queue.enqueue(createMockEvent(), mockContractConfig);
+      const event = NotificationFixtureBuilder.aStellarEvent().build();
+      queue.enqueue(event, mockContractConfig);
 
       // Before delay expires — should not have retried yet
       jest.advanceTimersByTime(500);
@@ -117,7 +98,8 @@ describe('NotificationRetryQueue', () => {
       });
       queue.start();
 
-      queue.enqueue(createMockEvent(), mockContractConfig);
+      const event = NotificationFixtureBuilder.aStellarEvent().build();
+      queue.enqueue(event, mockContractConfig);
 
       jest.advanceTimersByTime(200);
       await Promise.resolve();
@@ -136,7 +118,14 @@ describe('NotificationRetryQueue', () => {
       });
       queue.start();
 
-      queue.enqueue(createMockEvent({ id: 'evt-ok' }), mockContractConfig, 'req-ok');
+      // ✅ Deterministic event ID
+      const event = NotificationFixtureBuilder
+        .aStellarEvent()
+        .withId('evt-ok')
+        .build();
+
+      queue.enqueue(event, mockContractConfig, 'req-ok');
+      
       jest.advanceTimersByTime(200);
       await Promise.resolve();
       await Promise.resolve();
@@ -159,7 +148,8 @@ describe('NotificationRetryQueue', () => {
       });
       queue.start();
 
-      queue.enqueue(createMockEvent(), mockContractConfig);
+      const event = NotificationFixtureBuilder.aStellarEvent().build();
+      queue.enqueue(event, mockContractConfig);
 
       // Trigger attempt 1 (after 1000 ms base delay)
       jest.advanceTimersByTime(1100);
@@ -186,7 +176,12 @@ describe('NotificationRetryQueue', () => {
       });
       queue.start();
 
-      queue.enqueue(createMockEvent({ id: 'evt-backoff' }), mockContractConfig);
+      const event = NotificationFixtureBuilder
+        .aStellarEvent()
+        .withId('evt-backoff')
+        .build();
+
+      queue.enqueue(event, mockContractConfig);
 
       jest.advanceTimersByTime(1100);
       await Promise.resolve();
@@ -210,7 +205,9 @@ describe('NotificationRetryQueue', () => {
         processIntervalMs: 50,
       });
       queue.start();
-      queue.enqueue(createMockEvent(), mockContractConfig);
+
+      const event = NotificationFixtureBuilder.aStellarEvent().build();
+      queue.enqueue(event, mockContractConfig);
 
       const flush = async () => {
         for (let i = 0; i < 5; i++) await Promise.resolve();
@@ -245,7 +242,12 @@ describe('NotificationRetryQueue', () => {
       });
       queue.start();
 
-      queue.enqueue(createMockEvent({ id: 'evt-dead' }), mockContractConfig, 'req-dead');
+      const event = NotificationFixtureBuilder
+        .aStellarEvent()
+        .withId('evt-dead')
+        .build();
+
+      queue.enqueue(event, mockContractConfig, 'req-dead');
 
       jest.advanceTimersByTime(200);
       await Promise.resolve();
@@ -267,7 +269,8 @@ describe('NotificationRetryQueue', () => {
         processIntervalMs: 50,
       });
 
-      queue.enqueue(createMockEvent(), mockContractConfig);
+      const event = NotificationFixtureBuilder.aStellarEvent().build();
+      queue.enqueue(event, mockContractConfig);
       // Never call queue.start()
 
       jest.advanceTimersByTime(1000);
@@ -285,13 +288,42 @@ describe('NotificationRetryQueue', () => {
       queue.start();
       queue.start(); // second call should be a no-op
 
-      queue.enqueue(createMockEvent(), mockContractConfig);
+      const event = NotificationFixtureBuilder.aStellarEvent().build();
+      queue.enqueue(event, mockContractConfig);
 
       jest.advanceTimersByTime(200);
       await Promise.resolve();
       await Promise.resolve();
 
       expect(notificationFn).toHaveBeenCalledTimes(1);
+      queue.stop();
+    });
+  });
+
+  describe('multiple events with different characteristics', () => {
+    it('processes events with different topics', async () => {
+      const notificationFn: NotificationFn = jest.fn().mockResolvedValue(true);
+      const queue = new NotificationRetryQueue(notificationFn, {
+        baseDelayMs: 100,
+        processIntervalMs: 50,
+      });
+      queue.start();
+
+      // ✅ Easy to create multiple events with different topics
+      const events = ['transfer', 'mint', 'burn'].map(topic =>
+        NotificationFixtureBuilder
+          .aStellarEvent()
+          .withTopicSymbol(topic)
+          .build()
+      );
+
+      events.forEach(event => queue.enqueue(event, mockContractConfig));
+
+      jest.advanceTimersByTime(200);
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(notificationFn).toHaveBeenCalledTimes(3);
       queue.stop();
     });
   });

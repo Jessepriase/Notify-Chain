@@ -32,5 +32,16 @@ export interface Config {
   discord?: DiscordConfig;
   retryQueue?: RetryQueueConfig;
   webhookSecrets?: WebhookSecret[];
+  scheduler?: SchedulerConfig;
+  databasePath?: string;
+}
+
+export interface SchedulerConfig {
+  enabled: boolean;
+  pollIntervalMs: number;
+  lockTimeoutMs: number;
+  processorId?: string;
+  batchSize: number;
+  timingBufferMs: number;
 }
 
