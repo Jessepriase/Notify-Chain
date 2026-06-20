@@ -116,6 +116,10 @@ export function loadConfig(): Config {
   const discord = loadDiscordConfig();
   const rawContractAddresses = parseJsonEnv<unknown>('CONTRACT_ADDRESSES', '[]');
   const rawWebhookSecrets = parseJsonEnv<unknown>('WEBHOOK_SECRETS', '[]');
+  const clientOverrides = parseJsonEnv<Record<string, { maxRequests: number; windowMs?: number }>>(
+    'RATE_LIMIT_CLIENT_OVERRIDES',
+    '{}'
+  );
 
   return {
     stellarNetwork: trimEnv('STELLAR_NETWORK') || 'testnet',
@@ -141,6 +145,12 @@ export function loadConfig(): Config {
       processorId: trimEnv('SCHEDULER_PROCESSOR_ID'),
       batchSize: parseIntegerEnv('SCHEDULER_BATCH_SIZE', '10'),
       timingBufferMs: parseIntegerEnv('SCHEDULER_TIMING_BUFFER_MS', '60000'),
+    },
+    rateLimit: {
+      enabled: trimEnv('RATE_LIMIT_ENABLED') !== 'false',
+      windowMs: parseIntegerEnv('RATE_LIMIT_WINDOW_MS', '60000'),
+      maxRequests: parseIntegerEnv('RATE_LIMIT_MAX_REQUESTS', '60'),
+      clientOverrides,
     },
   };
 }

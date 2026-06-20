@@ -18,6 +18,13 @@ export interface RetryQueueConfig {
 export interface WebhookSecret {
   id: string;
   secret: string;
+}  
+  
+export interface RateLimitConfig {
+  enabled: boolean;
+  windowMs: number;
+  maxRequests: number;
+  clientOverrides: Record<string, { maxRequests: number; windowMs?: number }>;
 }
 
 export interface Config {
@@ -34,6 +41,7 @@ export interface Config {
   webhookSecrets?: WebhookSecret[];
   scheduler?: SchedulerConfig;
   databasePath?: string;
+  rateLimit?: RateLimitConfig;
 }
 
 export interface SchedulerConfig {
