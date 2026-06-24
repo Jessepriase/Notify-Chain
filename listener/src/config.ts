@@ -117,6 +117,7 @@ export function loadConfig(): Config {
   const rawContractAddresses = parseJsonEnv<unknown>('CONTRACT_ADDRESSES', '[]');
   const rawWebhookSecrets = parseJsonEnv<unknown>('WEBHOOK_SECRETS', '[]');
   const clientOverrides = parseJsonEnv<Record<string, { maxRequests: number; windowMs?: number>>(
+  const clientOverrides = parseJsonEnv<Record<string, { maxRequests: number; windowMs?: number }>>(
     'RATE_LIMIT_CLIENT_OVERRIDES',
     '{}'
   );

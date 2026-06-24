@@ -33,6 +33,8 @@ jest.mock('@stellar/stellar-sdk', () => ({
   TransactionBuilder: mockTransactionBuilder,
   BASE_FEE: '100',
   scValToNative: jest.fn(),
+    })),
+  },
 }));
 import { preferenceStore } from '../store/preference-store';
 
@@ -92,6 +94,7 @@ describe('Preference API endpoints', () => {
       stellarNetworkPassphrase: 'Test SDF Network ; September 2015', 
       contractAddresses: [] 
     });
+    server = createEventsServer({ port: 0, stellarRpcUrl: 'http://localhost' });
     server.listen(0, '127.0.0.1', done);
   });
 
@@ -217,6 +220,7 @@ const BASE_OPTIONS = {
   stellarNetworkPassphrase: 'Test SDF Network ; September 2015', 
   contractAddresses: [] 
 };
+const BASE_OPTIONS = { port: 0, stellarRpcUrl: 'https://test' };
 
 describe('POST /api/webhooks', () => {
   let server: http.Server;
