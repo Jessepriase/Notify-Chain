@@ -32,7 +32,7 @@ async function main() {
 
     // Rebuild registry with configured event TTL
     if (config.cleanup) {
-      eventRegistry['ttlMs'] = config.cleanup.eventRetentionMs;
+      (eventRegistry as any).ttlMs = config.cleanup.eventRetentionMs;
     }
 
     cleanupService = new CleanupService(db, eventRegistry, config.cleanup);

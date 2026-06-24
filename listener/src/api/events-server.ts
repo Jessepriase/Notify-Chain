@@ -8,6 +8,7 @@ import { NotificationType } from '../types/scheduled-notification';
 import logger from '../utils/logger';
 import { generateRequestId, resolveCorrelationId } from '../utils/request-id';
 import { NotificationHistoryService } from '../services/notification-history';
+import { SearchSuggestionService } from '../services/search-suggestion';
 import {
   verifySignature,
   extractSignature,
@@ -159,6 +160,7 @@ function isRateLimitExempt(pathname: string): boolean {
 export function createEventsServer(options: EventsServerOptions): http.Server {
   const corsOrigin = options.corsOrigin ?? 'http://localhost:5173';
   const historyService = new NotificationHistoryService();
+  const suggestionService = new SearchSuggestionService();
   const rateLimiter = options.rateLimit ? new RateLimiter(options.rateLimit) : undefined;
 
   const server = http.createServer(async (req, res) => {
@@ -489,6 +491,31 @@ export function createEventsServer(options: EventsServerOptions): http.Server {
         })
         .catch((error) => {
           logger.error('Failed to retrieve notification history', { error, requestId, correlationId });
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (error as Error).message }));
+        });
+      return;
+    }
+
+    // GET /api/search/suggestions
+    if (req.method === 'GET' && url.pathname === '/api/search/suggestions') {
+      const q = url.searchParams.get('q') || '';
+      const limit = url.searchParams.get('limit') ? parseInt(url.searchParams.get('limit')!, 10) : undefined;
+
+      logger.info('Handling GET /api/search/suggestions', { requestId, correlationId, q, limit });
+
+      suggestionService.getSuggestions(q, limit)
+        .then((result) => {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(result));
+
+          logger.info('GET /api/search/suggestions complete', {
+            requestId,
+            durationMs: Date.now() - startTime,
+          });
+        })
+        .catch((error) => {
+          logger.error('Failed to retrieve search suggestions', { error, requestId, correlationId });
           res.writeHead(500, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: (error as Error).message }));
         });
