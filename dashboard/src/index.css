@@ -719,6 +719,11 @@ body {
   background: rgba(167, 139, 250, 0.14);
 }
 
+.event-explorer__badge--paused {
+  color: #f4b400;
+  background: rgba(244, 180, 0, 0.14);
+}
+
 .event-explorer__badge--default {
   color: #e2e8f0;
   background: rgba(255, 255, 255, 0.08);
@@ -755,6 +760,71 @@ body {
 .event-explorer__empty-state h2 {
   margin: 0 0 10px;
   font-size: 1.4rem;
+}
+
+/* ─── Contract Status ────────────────────────────────────────── */
+.contract-statuses {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 16px;
+}
+
+.contract-statuses__title {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.contract-statuses__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contract-status-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.contract-status-card__address {
+  font-family: 'Courier New', Courier, monospace;
+  color: #e2e8f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.contract-status-card__badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.contract-status-card__badge--active {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.15);
+}
+
+.contract-status-card__badge--paused {
+  color: #f4b400;
+  background: rgba(244, 180, 0, 0.15);
+}
+
+.contract-status-card__error {
+  font-size: 0.78rem;
+  color: #f87171;
 }
 
 .pagination-controls {

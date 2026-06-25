@@ -8,11 +8,32 @@ import { NotificationType } from '../types/scheduled-notification';
 import { Database, getDatabase } from '../database/database';
 
 const mockGetHealth = jest.fn();
+const mockSimulateTransaction = jest.fn();
+const mockIsSuccessfulSim = jest.fn();
+const mockKeypairRandom = jest.fn(() => ({ publicKey: () => 'GAXXX' }));
+const mockContractCall = jest.fn();
+const mockTxBuilder = {
+  addOperation: jest.fn().mockReturnThis(),
+  setTimeout: jest.fn().mockReturnThis(),
+  build: jest.fn().mockReturnValue({}),
+};
+const mockTransactionBuilder = jest.fn(() => mockTxBuilder);
 
 jest.mock('@stellar/stellar-sdk', () => ({
   rpc: {
     Server: jest.fn().mockImplementation(() => ({
       getHealth: mockGetHealth,
+      simulateTransaction: mockSimulateTransaction,
+      getAccount: jest.fn().mockRejectedValue(new Error('not found')),
+    })),
+    isSuccessfulSim: mockIsSuccessfulSim,
+  },
+  Keypair: { random: mockKeypairRandom },
+  Account: jest.fn(),
+  Contract: jest.fn(() => ({ call: mockContractCall })),
+  TransactionBuilder: mockTransactionBuilder,
+  BASE_FEE: '100',
+  scValToNative: jest.fn(),
     })),
   },
 }));
@@ -68,6 +89,12 @@ describe('Preference API endpoints', () => {
 
   beforeEach((done) => {
     jest.clearAllMocks();
+    server = createEventsServer({ 
+      port: 0, 
+      stellarRpcUrl: 'http://localhost', 
+      stellarNetworkPassphrase: 'Test SDF Network ; September 2015', 
+      contractAddresses: [] 
+    });
     server = createEventsServer({ port: 0, stellarRpcUrl: 'http://localhost' });
     server.listen(0, '127.0.0.1', done);
   });
@@ -188,6 +215,12 @@ function closeServer(s: http.Server): Promise<void> {
   return new Promise((resolve) => s.close(() => resolve()));
 }
 
+const BASE_OPTIONS = { 
+  port: 0, 
+  stellarRpcUrl: 'https://test', 
+  stellarNetworkPassphrase: 'Test SDF Network ; September 2015', 
+  contractAddresses: [] 
+};
 const BASE_OPTIONS = { port: 0, stellarRpcUrl: 'https://test' };
 
 describe('POST /api/webhooks', () => {
