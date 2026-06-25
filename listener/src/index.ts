@@ -39,6 +39,7 @@ async function main() {
 
     // Rebuild registry with configured event TTL
     if (config.cleanup) {
+      (eventRegistry as any).ttlMs = config.cleanup.eventRetentionMs;
       eventRegistry.setTtlMs(config.cleanup.eventRetentionMs);
     }
 
