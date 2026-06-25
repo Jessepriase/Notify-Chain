@@ -989,3 +989,120 @@ body {
   color: #e8eaed;
   border-bottom-color: #1a73e8;
 }
+
+/* ── Notification Search Bar ────────────────────────────────────────────── */
+
+.notif-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin: 20px 0 16px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+}
+
+.notif-search__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 140px;
+}
+
+.notif-search__group--wide {
+  flex: 1 1 260px;
+}
+
+.notif-search__label {
+  font-size: 0.8rem;
+  color: #9aa0a6;
+  font-weight: 500;
+}
+
+.notif-search__input {
+  padding: 8px 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  color: #e8eaed;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.notif-search__input:focus {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+
+.notif-search__input--date {
+  color-scheme: dark;
+}
+
+/* Status button group */
+.notif-search__status-group {
+  display: flex;
+  gap: 4px;
+}
+
+.notif-search__status-btn {
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  background: transparent;
+  color: #9aa0a6;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.notif-search__status-btn--active,
+.notif-search__status-btn[aria-pressed="true"] {
+  background: #1a73e8;
+  border-color: #1a73e8;
+  color: #fff;
+}
+
+.notif-search__status-btn:hover:not(.notif-search__status-btn--active) {
+  background: rgba(255,255,255,0.07);
+  color: #e8eaed;
+}
+
+/* Clear button */
+.notif-search__clear {
+  align-self: flex-end;
+  padding: 8px 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  background: transparent;
+  color: #9aa0a6;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.notif-search__clear:hover {
+  color: #e8eaed;
+  border-color: rgba(255,255,255,0.3);
+}
+
+/* Responsive: stack to single column on small screens */
+@media (max-width: 600px) {
+  .notif-search {
+    flex-direction: column;
+  }
+
+  .notif-search__group,
+  .notif-search__group--wide {
+    width: 100%;
+  }
+
+  .notif-search__status-group {
+    width: 100%;
+  }
+
+  .notif-search__status-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
