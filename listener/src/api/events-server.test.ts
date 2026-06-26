@@ -34,8 +34,6 @@ jest.mock('@stellar/stellar-sdk', () => ({
   TransactionBuilder: mockTransactionBuilder,
   BASE_FEE: '100',
   scValToNative: jest.fn(),
-    })),
-  },
 }));
 import { preferenceStore } from '../store/preference-store';
 
@@ -215,13 +213,12 @@ function closeServer(s: http.Server): Promise<void> {
   return new Promise((resolve) => s.close(() => resolve()));
 }
 
-const BASE_OPTIONS = { 
-  port: 0, 
-  stellarRpcUrl: 'https://test', 
-  stellarNetworkPassphrase: 'Test SDF Network ; September 2015', 
-  contractAddresses: [] 
+const BASE_OPTIONS = {
+  port: 0,
+  stellarRpcUrl: 'https://test',
+  stellarNetworkPassphrase: 'Test SDF Network ; September 2015',
+  contractAddresses: []
 };
-const BASE_OPTIONS = { port: 0, stellarRpcUrl: 'https://test' };
 
 describe('POST /api/webhooks', () => {
   let server: http.Server;
