@@ -1,4 +1,3 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { IdempotencyKeyService } from './idempotency-key-service';
 import { IdempotencyKeyRepository } from './idempotency-key-repository';
 
@@ -8,11 +7,11 @@ describe('IdempotencyKeyService', () => {
 
   beforeEach(() => {
     mockRepository = {
-      getCachedResponse: vi.fn(),
-      validateRequestHash: vi.fn(),
-      storeResponse: vi.fn(),
-      cleanupExpiredKeys: vi.fn(),
-      getStats: vi.fn(),
+      getCachedResponse: jest.fn(),
+      validateRequestHash: jest.fn(),
+      storeResponse: jest.fn(),
+      cleanupExpiredKeys: jest.fn(),
+      getStats: jest.fn(),
     };
     service = new IdempotencyKeyService(mockRepository as IdempotencyKeyRepository);
   });
@@ -27,7 +26,7 @@ describe('IdempotencyKeyService', () => {
       mockRepository.validateRequestHash.mockResolvedValue(true);
       mockRepository.storeResponse.mockResolvedValue(1);
 
-      const processor = vi.fn().mockResolvedValue(processorResult);
+      const processor = jest.fn().mockResolvedValue(processorResult);
 
       const result = await service.processWithIdempotency(
         idempotencyKey,
@@ -90,7 +89,7 @@ describe('IdempotencyKeyService', () => {
       const requestBody = { payload: 'test' };
       const processorResult = 42;
 
-      const processor = vi.fn().mockResolvedValue(processorResult);
+      const processor = jest.fn().mockResolvedValue(processorResult);
 
       const result = await service.processWithIdempotency(
         undefined,

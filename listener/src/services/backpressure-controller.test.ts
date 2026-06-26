@@ -1,4 +1,3 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import { BackpressureController } from './backpressure-controller';
 
 describe('BackpressureController', () => {
