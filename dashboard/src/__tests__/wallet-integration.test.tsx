@@ -238,7 +238,7 @@ describe('Notification feed clears on wallet switch (issue #175)', () => {
     await wallet.disconnectWallet();
 
     expect(store.useWalletStore.getState().address).toBeNull();
-    expect(localStorage.getItem(WALLET_ADDRESS_KEY)).toBeNull();
+    expect(localStorage.getItem('notify-chain:wallet-address')).toBeNull();
   });
 
   it('no stale address remains in localStorage after switching wallets', async () => {
@@ -257,8 +257,8 @@ describe('Notification feed clears on wallet switch (issue #175)', () => {
     await wallet.connectWallet();
 
     // localStorage must reflect the new account only
-    expect(localStorage.getItem(WALLET_ADDRESS_KEY)).toBe(SUPPORTED_WALLETS[2].address);
-    expect(localStorage.getItem(WALLET_ADDRESS_KEY)).not.toBe(SUPPORTED_WALLETS[0].address);
+    expect(localStorage.getItem('notify-chain:wallet-address')).toBe(SUPPORTED_WALLETS[2].address);
+    expect(localStorage.getItem('notify-chain:wallet-address')).not.toBe(SUPPORTED_WALLETS[0].address);
     expect(store.useWalletStore.getState().address).toBe(SUPPORTED_WALLETS[2].address);
   });
 
@@ -282,7 +282,7 @@ describe('Notification feed clears on wallet switch (issue #175)', () => {
       await wallet.connectWallet();
 
       expect(store.useWalletStore.getState().address).toBe(provider.address);
-      expect(localStorage.getItem(WALLET_ADDRESS_KEY)).toBe(provider.address);
+      expect(localStorage.getItem('notify-chain:wallet-address')).toBe(provider.address);
       expect(localStorage.getItem(WALLET_ID_KEY)).toBe(provider.id);
 
       localStorage.clear();
