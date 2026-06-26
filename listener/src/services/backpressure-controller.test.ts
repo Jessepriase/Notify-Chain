@@ -30,9 +30,10 @@ describe('BackpressureController', () => {
       controller.checkAndApplyBackpressure(101);
       expect(controller.isActive()).toBe(true);
 
-      // Then recover
-      const isActive = controller.checkAndApplyBackpressure(49);
-      expect(isActive).toBe(false);
+      // Then recover - checkAndApplyBackpressure returns true if state changed
+      const stateChanged = controller.checkAndApplyBackpressure(49);
+      expect(stateChanged).toBe(true);
+      // After recovery, isActive() should be false
       expect(controller.isActive()).toBe(false);
     });
 
