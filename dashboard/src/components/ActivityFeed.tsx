@@ -151,6 +151,7 @@ export function ActivityFeed() {
 
   // Clear stale activity and re-fetch from page 1 whenever the connected
   // wallet address changes (switch or disconnect). This is the fix for issue #175.
+  // _nextAddress intentionally omitted — callers do not need the new value
   useWalletAccountSync(() => {
     setEvents([]);
     setLiveEvents([]);
