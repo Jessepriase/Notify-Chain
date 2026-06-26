@@ -36,7 +36,7 @@ describe('IdempotencyKeyService', () => {
 
       expect(result.result).toBe(processorResult);
       expect(result.isDuplicate).toBe(false);
-      expect(processor).toHaveBeenCalledOnce();
+      expect(processor).toHaveBeenCalledTimes(1);
       expect(mockRepository.storeResponse).toHaveBeenCalled();
     });
 
@@ -99,7 +99,7 @@ describe('IdempotencyKeyService', () => {
 
       expect(result.result).toBe(processorResult);
       expect(result.isDuplicate).toBe(false);
-      expect(processor).toHaveBeenCalledOnce();
+      expect(processor).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -110,7 +110,7 @@ describe('IdempotencyKeyService', () => {
       const count = await service.cleanupExpiredKeys();
 
       expect(count).toBe(5);
-      expect(mockRepository.cleanupExpiredKeys).toHaveBeenCalledOnce();
+      expect(mockRepository.cleanupExpiredKeys).toHaveBeenCalledTimes(1);
     });
   });
 
