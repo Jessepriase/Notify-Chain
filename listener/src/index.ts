@@ -115,7 +115,7 @@ async function main() {
     }
 
     if (archiveService) {
-      archiveService.stop();
+      await archiveService.stop();
     }
 
     if (scheduler) {
