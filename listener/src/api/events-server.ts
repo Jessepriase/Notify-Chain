@@ -17,7 +17,6 @@ import {
   collectRawBody,
 } from '../services/webhook-verifier';
 import { WebhookSecret, RateLimitConfig, ContractConfig } from '../types';
-import { WebhookSecret, RateLimitConfig } from '../types';
 import { RateLimiter } from './rate-limiter';
 import {
   getNotificationAnalyticsAggregator,
